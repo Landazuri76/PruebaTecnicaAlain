@@ -1,0 +1,63 @@
+﻿.app {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+
+}
+
+.main-menu {
+    text-align: center;
+}
+
+
+.game-scene {
+    display: flex;
+}
+
+.result {
+    text-align : center;
+}
+
+.main-menu-container, .game-scene-container, .result {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    border: 10px solid #3498db;
+    padding: 40px;
+    border-radius: 20px;
+    box-sizing: border-box;
+    background-color: #3498db;
+}
+
+.player {
+    flex: 1;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+}
+
+.options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+button {
+    padding: 10px;
+    font-size: 16px;   
+}
+    button:hover {
+        background-color: #00cc66;
+    }
+
+.waiting-message, .round-winner {
+    position: absolute;
+    bottom: 10px;    
+    left: 50%;
+    text-align: center;
+    transform: translateX(-50%);
+    width: 100%;
+}

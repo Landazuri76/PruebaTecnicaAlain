@@ -1,0 +1,6 @@
+@Prueba1.Server_HostAddress = http://localhost:5032
+
+GET {{Prueba1.Server_HostAddress}}/juego/
+Accept: application/json
+
+###
