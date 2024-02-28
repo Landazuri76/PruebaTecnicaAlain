@@ -8,7 +8,7 @@ interface MainMenuProps {
 interface GameSceneProps {
     onSelection: (selection: string) => void;
 }
-
+//Menu principal con botón que activa la función onStartGame y da paso al juego.
 const MainMenu: React.FC<MainMenuProps> = ({ onStartGame }) => {
     return (
         <div className="main-menu-container">
@@ -19,25 +19,27 @@ const MainMenu: React.FC<MainMenuProps> = ({ onStartGame }) => {
         </div>
     );
 };
-
+//
 const GameScene: React.FC<GameSceneProps> = ({ onSelection }) => {
-    const [jugadas, setJugadas] = useState<string[]>([]);
-    const [selections, setSelections] = useState<{ player1: string, player2: string }>({ player1: '', player2: '' });
-    const [waitingMessage, setWaitingMessage] = useState<string>('Esperando al Jugador 1');
-    const [gameInProgress, setGameInProgress] = useState<boolean>(true);
-    const [score, setScore] = useState<{ player1: number, player2: number }>({ player1: 0, player2: 0 });
-    const [roundWinner, setRoundWinner] = useState<string>('');
+    const [jugadas, setJugadas] = useState<string[]>([]);//Almacena las opciones del juego(piedra,papel y tijera).
+    const [selections, setSelections] = useState<{ player1: string, player2: string }>({ player1: '', player2: '' });//Almacena las selecciones que realice el usuario.
+    const [waitingMessage, setWaitingMessage] = useState<string>('Esperando al Jugador 1');//Mensaje que se muestra cuando un jugador ha hecho su seleccion.
+    const [gameInProgress, setGameInProgress] = useState<boolean>(true);//Indica si el juego esta en curso.
+    const [score, setScore] = useState<{ player1: number, player2: number }>({ player1: 0, player2: 0 });//Almacena la puntuación de cada jugador.
+    const [roundWinner, setRoundWinner] = useState<string>('');//Indica el jugador ganador.
 
+    //Inicializa las jugadas.
     useEffect(() => {
         jugadasData();
     }, []);
 
+    //Función que toma los datos enviados por el backend y los almacena.
     async function jugadasData() {
         const response = await fetch('juego');
         const data = await response.json();
         setJugadas(data);
     }
-
+    //Controla los eventos del teclado para que los jugadores puedan hacer su selección mediante las teclas asignadas a cada botón.
     const handleKeyPress = useCallback((event: KeyboardEvent) => {
         if (!gameInProgress) return;
         switch (event.key) {
@@ -64,6 +66,7 @@ const GameScene: React.FC<GameSceneProps> = ({ onSelection }) => {
         }
     }, [jugadas, gameInProgress]);
 
+    //Para manejar el evento del teclado.
     useEffect(() => {
         window.addEventListener('keydown', handleKeyPress);
         return () => {
@@ -71,6 +74,7 @@ const GameScene: React.FC<GameSceneProps> = ({ onSelection }) => {
         };
     }, [handleKeyPress]);
 
+    //Determina el ganador de cada ronda y suma 1 al contador de victorias.
     useEffect(() => {
         const determineWinner = () => {
             const { player1, player2 } = selections;
@@ -89,7 +93,9 @@ const GameScene: React.FC<GameSceneProps> = ({ onSelection }) => {
                     setRoundWinner('Jugador 2');
                     setScore(prevState => ({ ...prevState, player2: prevState.player2 + 1 }));
                 } 
+                //Al hacer la jugada el juego se detiene para que no se puedan realizar acciones mientras se muestra el resultado de la ronda.
                 setGameInProgress(false);
+                //Se establece un pequeño tiempo para que el usuario vea el resultado antes de volver a tener el conrtol.
                 setTimeout(() => {
                     resetRound();                                     
                 }, 2000);              
@@ -98,6 +104,8 @@ const GameScene: React.FC<GameSceneProps> = ({ onSelection }) => {
         determineWinner();
     }, [selections, jugadas]);
 
+    //Se usa para detectar si alguno de los jugadores ha alcanzado las 3 victorias.
+    //Se establece un valor a gameInProgress dependiendo de si el juego continua o se ha terminado.
     const resetRound = () => {
         setSelections({ player1: '', player2: '' });
         if (score.player1 === 3 || score.player2 === 3) {
@@ -107,12 +115,13 @@ const GameScene: React.FC<GameSceneProps> = ({ onSelection }) => {
         }
         if (score.player1 === 3) {
             setWaitingMessage('Jugador 1 ha ganado la partida');
-        } else if (score.player2 === 3) {
+        } if (score.player2 === 3) {
             setWaitingMessage('Jugador 2 ha ganado la partida');
         } 
         setRoundWinner('');
     };
 
+    //Mensaje que se muestra cuando uno de los jugadores ha hecho su selección y se espera respuesta del otro.
     useEffect(() => {
         if (selections.player1 && !selections.player2) {
             setWaitingMessage('Esperando al Jugador 2...');
@@ -123,6 +132,8 @@ const GameScene: React.FC<GameSceneProps> = ({ onSelection }) => {
         }
     }, [selections]);
 
+    //Se usa cuando uno de los jugadores ha alcanzado las 3 victorias
+    // para reiniciar los marcadores de ambos jugadores y dar paso a una nueva partida.
     const handleRestart = () => {
         setScore({ player1: 0, player2: 0 });
         resetRound();

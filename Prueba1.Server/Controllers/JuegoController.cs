@@ -15,7 +15,6 @@ namespace Prueba1.Server.Controllers
         public IEnumerable<string> Get()
         {
             return Jugadas;
-
         }
     }
 }
